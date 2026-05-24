@@ -12,7 +12,7 @@ export async function POST(req) {
       return Response.json({ success: false, error: "No API key configured" }, { status: 500 });
     }
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash-latest",
+      model: "gemini-pro",
       systemInstruction: systemPrompt,
       generationConfig: { temperature: 0.8, topP: 0.95, maxOutputTokens: 1000 },
     });
