@@ -8,6 +8,9 @@ export async function POST(req) {
     if (!message) {
       return Response.json({ success: false, error: "Message required" }, { status: 400 });
     }
+    if (!process.env.GEMINI_API_KEY) {
+      return Response.json({ success: false, error: "No API key configured" }, { status: 500 });
+    }
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash",
       systemInstruction: systemPrompt,
@@ -30,7 +33,7 @@ export async function POST(req) {
     if (!reply) throw new Error("Empty response");
     return Response.json({ success: true, reply });
   } catch (error) {
-    console.error("Oracle error:", error);
-    return Response.json({ success: false, error: "Oracle error. Please try again." }, { status: 500 });
+    console.error("Oracle error full:", error?.message, JSON.stringify(error));
+    return Response.json({ success: false, error: error?.message || "Oracle error" }, { status: 500 });
   }
 }
