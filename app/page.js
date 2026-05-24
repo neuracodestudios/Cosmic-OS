@@ -1066,18 +1066,17 @@ ORACLE DIRECTIVES:
 
     try {
       const history = messages.slice(-10).map(m=>({role:m.role,content:m.content}));
-      const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      const resp = await fetch("/api/oracle", {
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body: JSON.stringify({
-          model:"claude-sonnet-4-20250514",
-          max_tokens:1000,
-          system:systemPrompt,
-          messages:[...history,{role:"user",content:text}],
+message: text,
+          systemPrompt,
+          history,
         }),
       });
       const data = await resp.json();
-      const reply = data.content?.[0]?.text || "The cosmic signal falters. The stars ask you to try once more.";
+     const reply = data.reply || "The cosmic signal falters. The stars ask you to try once more.";
       const astMsg = {role:"assistant", content:reply, ts:Date.now()};
       dispatch({type:"ADD_MESSAGE", payload:astMsg});
       dispatch({type:"ADD_XP", payload:15});
@@ -1512,15 +1511,15 @@ function SynastryChamber({ mainUser }) {
     if (!result) return;
     setLoadingAI(true);
     try {
-      const resp = await fetch("https://api.anthropic.com/v1/messages",{
+      const resp = await fetch("/api/oracle",{
         method:"POST",headers:{"Content-Type":"application/json"},
         body:JSON.stringify({
-          model:"claude-sonnet-4-20250514",max_tokens:600,
-          messages:[{role:"user",content:`Provide a brief, poetic synastry reading (3 paragraphs) for: ${p1.name} (${result.z1.sign} Sun, Life Path ${result.lp1}) and ${p2.name} (${result.z2.sign} Sun, Life Path ${result.lp2}). Overall compatibility: ${result.overall}%. Key aspects: ${result.synastryAspects.slice(0,4).map(a=>`${a.p1}-${a.p2} ${a.aspect}`).join(", ")}. Speak as the Cosmic Oracle.`}],
+          message:`Provide a brief, poetic synastry reading (3 paragraphs) for: ${p1.name} (${result.z1.sign} Sun, Life Path ${result.lp1}) and ${p2.name} (${result.z2.sign} Sun, Life Path ${result.lp2}). Overall compatibility: ${result.overall}%. Key aspects: ${result.synastryAspects.slice(0,4).map(a=>`${a.p1}-${a.p2} ${a.aspect}`).join(", ")}. Speak as the Cosmic Oracle.`,
+        }),
         }),
       });
       const data = await resp.json();
-      setAiInsight(data.content?.[0]?.text || "");
+      setAiInsight(data.reply || "");
     } catch { setAiInsight("The Oracle is momentarily silent."); }
     setLoadingAI(false);
   };
