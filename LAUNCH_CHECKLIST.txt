@@ -1,0 +1,231 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                  COSMIC OS — OPTION B LAUNCH CHECKLIST                       ║
+║                           QUICK REFERENCE GUIDE                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+STEP 1: UPDATE FRONTEND (5 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+In CosmicOS.jsx, find and replace TWO fetch calls (lines 1064 & 1510):
+
+FROM:
+  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+
+TO:
+  const resp = await fetch("/api/oracle", {
+
+Also update request body (around line 1067):
+
+FROM:
+  body: JSON.stringify({
+    model:"claude-sonnet-4-20250514",
+    max_tokens:1000,
+    system:systemPrompt,
+    messages:[...history,{role:"user",content:text}],
+  }),
+
+TO:
+  body: JSON.stringify({
+    message: text,
+    systemPrompt: systemPrompt,
+    history: messages.slice(-10).map(m=>({role:m.role,content:m.content})),
+    mode: mode,
+  }),
+
+And response parsing (around line 1075):
+
+FROM:
+  const reply = data.content?.[0]?.text || "...";
+
+TO:
+  const reply = data.reply || data.content?.[0]?.text || "...";
+
+
+STEP 2: SETUP VERCEL (3 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Go to https://vercel.com
+2. Sign up/login
+3. Click "New Project"
+4. Import GitHub repo OR upload files
+5. Follow prompts
+6. You get a URL: https://your-app.vercel.app
+
+
+STEP 3: CREATE BACKEND (5 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Create file: /api/oracle/route.js (Next.js) or /api/oracle.js (Node)
+
+Copy entire contents of oracle-api-proxy.js into this file.
+
+That's it. Vercel handles the rest.
+
+
+STEP 4: SET API KEY (2 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Vercel Dashboard → Your Project
+2. Settings → Environment Variables
+3. Add:
+   Name:  ANTHROPIC_API_KEY
+   Value: sk-ant-... (get from https://console.anthropic.com)
+4. Save
+
+⚠️  CRITICAL: Never hardcode API keys in code!
+
+
+STEP 5: DEPLOY & TEST (5 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. git push (or upload to Vercel)
+2. Wait for deployment (30 seconds)
+3. Visit your URL
+4. Go to Oracle section
+5. Send a test message
+6. You should get an AI response
+
+If it breaks:
+  • Check Vercel logs (Settings → Functions)
+  • 99%: API key not set correctly
+  • Fix: Go back to Step 4, verify, redeploy
+
+
+STEP 6: CUSTOM DOMAIN (Optional, 5 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Buy domain (Namecheap.com, $10/year)
+2. Vercel Dashboard → Settings → Domains
+3. Add your domain
+4. Follow DNS setup instructions
+5. Done (works in 5 minutes)
+
+This makes it look professional: https://cosmicos.app
+
+
+STEP 7: TEST CHECKLIST (10 min)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Desktop:
+  ☐ Landing page loads
+  ☐ Dark theme toggle works
+  ☐ Onboarding completes
+  ☐ Dashboard loads all sections
+  ☐ Oracle responds with AI (not error)
+  ☐ Chart calculates
+  ☐ Journal saves
+  ☐ Theme persists after reload
+
+Mobile:
+  ☐ Responsive design works
+  ☐ Mobile nav appears
+  ☐ Oracle works on phone
+
+Performance:
+  ☐ Page loads <3 seconds
+  ☐ Oracle responds <5 seconds
+  ☐ No console errors (F12 → Console tab)
+
+Security:
+  ☐ No API key in Network tab (F12)
+  ☐ Calls go to /api/oracle (not api.anthropic.com)
+
+
+STEP 8: LAUNCH! (Immediate)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Hour 1:
+  1. Tweet: "🌌 Just launched Cosmic OS - AI-powered cosmic advisor
+      powered by Claude. Ask about your birth chart, numerology, and life path.
+      Live now: [your-url]"
+      Tag @anthropic @producthunt @Reddit
+
+  2. Post to Reddit:
+     - r/astrology: "Built an AI Oracle that reads your birth chart"
+     - r/numerology: "AI numerology + birth chart analyzer"
+     - r/artificial: "AI that analyzes cosmic influence on your life"
+
+  3. ProductHunt (https://www.producthunt.com/products/new):
+     - Title: "Cosmic OS - Your AI-Powered Cosmic Advisor"
+     - Tagline: "Ask your Oracle anything about your life"
+     - Describe: Oracle + real ephemeris + dark theme + live Claude AI
+     - Screenshots: 5 pics of best features
+     - Make it beautiful
+
+First 24 hours:
+  • Monitor uptime (should be 99.9%)
+  • Watch API costs on Anthropic console
+  • Respond to all comments (Reddit, Twitter, ProductHunt)
+  • Pin best comments
+
+Week 1:
+  • Add email signup
+  • Create pricing page
+  • Collect user feedback
+
+
+TOTAL TIMELINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Step 1 (Frontend):    5 min
+Step 2 (Vercel):      3 min
+Step 3 (Backend):     5 min
+Step 4 (API Key):     2 min
+Step 5 (Test):        5 min
+Step 6 (Domain):      5 min (skip if using vercel.app URL)
+Step 7 (Checklist):  10 min
+Step 8 (Launch):   Immediate!
+
+TOTAL: 35 minutes until you're live
+       Plus custom domain setup (optional, can do after)
+
+YOU CAN BE LIVE BEFORE DINNER. 🚀
+
+
+KEY REMINDERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ DO:
+  • Store API key in Vercel environment variables
+  • Test Oracle locally before deploying
+  • Check Vercel logs when debugging
+  • Monitor your API usage
+
+❌ DON'T:
+  • Put API key in code
+  • Commit secrets to git
+  • Deploy without testing
+  • Share your Vercel URL until you're ready
+
+
+NEED HELP?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Oracle not responding?
+  → Check Vercel logs for error
+  → Verify ANTHROPIC_API_KEY is set in Vercel dashboard
+  → Test API key manually at https://console.anthropic.com
+
+Page won't load?
+  → Clear browser cache (Cmd+Shift+R or Ctrl+Shift+R)
+  → Check Vercel deployment status
+
+Costs too high?
+  → Set billing limit in Anthropic console
+  → Monitor API usage in console
+
+Questions?
+  → Docs: docs.anthropic.com
+  → Vercel: vercel.com/support
+  → Anthropic: support.anthropic.com
+
+
+YOU'VE GOT THIS 🎯
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+You built something special. The hard part is done.
+This is just connecting the pieces.
+
+30 minutes of straightforward work = global launch.
+
+Let's ship. 🚀
