@@ -1,14 +1,16 @@
+
 {
   "name": "cosmic-os",
   "version": "1.0.0",
-  "description": "Cosmic OS AI system",
-  "main": "CosmicOS.jsx",
   "scripts": {
-    "start": "node CosmicOS.jsx",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
-  "license": "ISC",
   "dependencies": {
-    "@google/generative-ai": "^latest"
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@google/generative-ai": "^0.24.0"
   }
 }
