@@ -1,23 +1,23 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 export async function POST(req) {
   try {
     const { message, systemPrompt, history } = await req.json();
-    if (!message) {
-      return Response.json({ success: false, error: "Message required" }, { status: 400 });
+    
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return Response.json({ success: false, error: "NO API KEY FOUND" }, { status: 500 });
     }
-    if (!process.env.GEMINI_API_KEY) {
-      return Response.json({ success: false, error: "No API key configured" }, { status: 500 });
-    }
+
+    const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-pro",
+      model: "gemini-2.5-flash",
       systemInstruction: systemPrompt,
-      generationConfig: { temperature: 0.8, topP: 0.95, maxOutputTokens: 1000 },
+      generationConfig: { temperature: 0.8, maxOutputTokens: 1000 },
     });
+
     const contents = [];
-    if (history && history.length > 0) {
+    if (history?.length > 0) {
       history.slice(-8).forEach(msg => {
         if (msg.role && msg.content) {
           contents.push({
@@ -28,12 +28,11 @@ export async function POST(req) {
       });
     }
     contents.push({ role: "user", parts: [{ text: message }] });
+
     const response = await model.generateContent({ contents });
     const reply = response.response.text();
-    if (!reply) throw new Error("Empty response");
     return Response.json({ success: true, reply });
   } catch (error) {
-    console.error("Oracle error full:", error?.message, JSON.stringify(error));
-    return Response.json({ success: false, error: error?.message || "Oracle error" }, { status: 500 });
+    return Response.json({ success: false, error: error?.message }, { status: 500 });
   }
 }
