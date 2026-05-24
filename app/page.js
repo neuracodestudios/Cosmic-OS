@@ -319,26 +319,29 @@ function appReducer(state, action) {
     case "SET_USER":
       return { ...state, user: action.payload, screen: "dashboard" };
     case "SET_CHART": return { ...state, chart: action.payload };
-    case "ADD_MESSAGE":
+    case "ADD_MESSAGE": {
       const newSession = [...state.session, action.payload];
       return { ...state, session: newSession, memoryBank: [...state.memoryBank.slice(-50), action.payload] };
+    }
     case "ADD_JOURNAL":
       return { ...state, journalEntries: [action.payload, ...state.journalEntries] };
-    case "ADD_XP":
+    case "ADD_XP": {
       const newXP = state.totalXP + action.payload;
       return { ...state, totalXP: newXP };
+    }
     case "UPDATE_ARCHETYPE_XP":
       return { ...state, archetypeXP: { ...state.archetypeXP, [action.key]: Math.min(100, state.archetypeXP[action.key] + action.amount) } };
     case "COMPLETE_QUEST":
       return { ...state, quests: { ...state.quests, [action.quest]: true }, totalXP: state.totalXP + action.xp };
     case "COMPLETE_RITUAL":
       return { ...state, ritualComplete: true, totalXP: state.totalXP + 75 };
-    case "SET_THEME":
+    case "SET_THEME": {
       const newTheme = action.payload;
       if (typeof window !== "undefined") {
         try { localStorage.setItem("cosmic_theme", newTheme); } catch {}
       }
       return { ...state, theme: newTheme };
+    }
     case "LOGOUT":
       return { ...initialState };
     default: return state;
@@ -347,6 +350,7 @@ function appReducer(state, action) {
 
 function AppProvider({ children }) {
   const [state, dispatch] = useReducer(appReducer, initialState, (init) => {
+    if (typeof window === "undefined") return init;
     try {
       const saved = localStorage.getItem("cosmicOS_state");
       if (saved) {
