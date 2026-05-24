@@ -1516,6 +1516,7 @@ function SynastryChamber({ mainUser }) {
         body:JSON.stringify({
           message:`Provide a brief, poetic synastry reading (3 paragraphs) for: ${p1.name} (${result.z1.sign} Sun, Life Path ${result.lp1}) and ${p2.name} (${result.z2.sign} Sun, Life Path ${result.lp2}). Overall compatibility: ${result.overall}%. Key aspects: ${result.synastryAspects.slice(0,4).map(a=>`${a.p1}-${a.p2} ${a.aspect}`).join(", ")}. Speak as the Cosmic Oracle.`,
         }),
+        });
   const data = await resp.json();
       setAiInsight(data.reply || "");
     } catch { setAiInsight("The Oracle is momentarily silent."); }
